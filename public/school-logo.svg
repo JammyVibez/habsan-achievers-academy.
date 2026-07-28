@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 220" role="img" aria-label="Habsan Achievers Academy Gajiri crest">
+  <defs>
+    <linearGradient id="shieldFill" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#f7faf5"/>
+      <stop offset="100%" stop-color="#e8f0e4"/>
+    </linearGradient>
+  </defs>
+  <!-- Shield -->
+  <path d="M100 8 C58 8 28 18 22 28 V98 C22 148 55 188 100 208 C145 188 178 148 178 98 V28 C172 18 142 8 100 8 Z"
+        fill="url(#shieldFill)" stroke="#0f3d1e" stroke-width="4"/>
+  <path d="M100 18 C62 18 38 26 34 34 V96 C34 140 62 174 100 192 C138 174 166 140 166 96 V34 C162 26 138 18 100 18 Z"
+        fill="none" stroke="#1b5e2a" stroke-width="1.5" opacity="0.55"/>
+
+  <!-- Graduation cap -->
+  <polygon points="100,42 58,58 100,74 142,58" fill="#0f3d1e"/>
+  <rect x="92" y="58" width="16" height="10" fill="#0f3d1e"/>
+  <path d="M142 58 V78 C142 84 132 88 124 88" fill="none" stroke="#0f3d1e" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="124" cy="88" r="3.5" fill="#c9a227"/>
+
+  <!-- Open book -->
+  <path d="M70 108 Q100 98 130 108 L130 142 Q100 132 70 142 Z" fill="#fff" stroke="#0f3d1e" stroke-width="2.5"/>
+  <path d="M100 100 V136" stroke="#0f3d1e" stroke-width="2"/>
+  <path d="M78 116 H92 M78 124 H90 M78 132 H88" stroke="#1b5e2a" stroke-width="1.4" opacity="0.55"/>
+  <path d="M108 116 H122 M110 124 H122 M112 132 H122" stroke="#1b5e2a" stroke-width="1.4" opacity="0.55"/>
+
+  <!-- Pencil -->
+  <g transform="translate(122 118) rotate(-35)">
+    <rect x="0" y="0" width="28" height="5" rx="1" fill="#c9a227"/>
+    <polygon points="28,0 36,2.5 28,5" fill="#f4d27a"/>
+    <polygon points="34,1.2 38,2.5 34,3.8" fill="#0f3d1e"/>
+  </g>
+
+  <!-- Inner label -->
+  <text x="100" y="162" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="9" font-weight="700" fill="#0f3d1e" letter-spacing="0.5">HABSAN ACADEMY</text>
+  <text x="100" y="174" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="8" font-weight="700" fill="#1b5e2a" letter-spacing="1.5">GAJIRI</text>
+
+  <!-- Motto ribbon -->
+  <path d="M28 188 H172 L164 204 H36 Z" fill="#0f3d1e"/>
+  <path d="M28 188 L18 198 L28 204 Z" fill="#14532d"/>
+  <path d="M172 188 L182 198 L172 204 Z" fill="#14532d"/>
+  <text x="100" y="199" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="6.5" font-weight="700" fill="#f8faf5" letter-spacing="0.4">KNOWLEDGE · DISCIPLINE · EXCELLENCE</text>
+</svg>

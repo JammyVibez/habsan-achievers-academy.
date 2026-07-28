@@ -29,10 +29,10 @@ export function generateStudentEmail(firstName: string, lastName: string, admiss
   return `${firstName.toLowerCase()}.${lastName.toLowerCase()}@habsan.edu.ng`;
 }
 
-// Validate admission number format
+// Validate admission number format used when creating accounts
 export function isValidAdmissionNumber(admissionNumber: string): boolean {
   const pattern = /^HAA\/\d{4}\/\d{3}$/;
-  return pattern.test(admissionNumber);
+  return pattern.test(admissionNumber.trim().toUpperCase());
 }
 
 // Extract year from admission number

@@ -4,6 +4,7 @@ import { resolveSessionAndTerm } from '@/lib/academic-calendar';
 import { buildReportCardForStudent } from '@/lib/report-card';
 import { buildReportCardHtml } from '@/lib/report-card-html';
 import { validateResultCheckingPin } from '@/lib/issued-result-pin';
+import { isAcceptedAdmissionNumber, normalizeAdmissionNumber } from '@/lib/admission-number';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,9 +14,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'PIN and admission number are required' }, { status: 400 });
     }
 
-    const admissionPattern = /^HAA\/\d{4}\/\d{3}$/;
-    if (!admissionPattern.test(admissionNumber)) {
-      return NextResponse.json({ error: 'Invalid admission number format' }, { status: 400 });
+    const normalizedAdmission = normalizeAdmissionNumber(String(admissionNumber));
+    if (!isAcceptedAdmissionNumber(normalizedAdmission)) {
+      return NextResponse.json(
+        { error: 'Invalid admission number format. Use HAA/YYYY/### (e.g. HAA/2024/001).' },
+        { status: 400 },
+      );
     }
 
     const pinCheck = await validateResultCheckingPin(String(pin));
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     const student = await prisma.student.findUnique({
-      where: { admissionNumber },
+      where: { admissionNumber: normalizedAdmission },
     });
 
     if (!student) {
@@ -60,14 +64,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const reportCardHTML = buildReportCardHtml(payload);
+    const assetOrigin = new URL(request.url).origin;
+    const reportCardHTML = buildReportCardHtml(payload, {
+      assetOrigin,
+      autoPrint: true,
+    });
 
     return NextResponse.json(
       {
         success: true,
         message: 'Report card generated successfully',
         html: reportCardHTML,
-        fileName: `ReportCard_${admissionNumber.replace(/\//g, '-')}_${new Date().getFullYear()}.pdf`,
+        fileName: `ReportCard_${normalizedAdmission.replace(/\//g, '-')}_${payload.term.replace(/\s+/g, '-')}.pdf`,
       },
       { status: 200 },
     );
