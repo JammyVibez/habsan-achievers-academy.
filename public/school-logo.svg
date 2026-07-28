@@ -1,72 +1,84 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 390" role="img" aria-label="Habsan Achievers Academy Gajiri crest">
-  <!-- Official crest: dark green line art on white -->
-  <g fill="none" stroke="#0b4d2c" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
-    <!-- Shield -->
-    <path d="M160 16
-      C105 16 58 28 44 44
-      V152
-      C44 236 90 300 160 356
-      C230 300 276 236 276 152
-      V44
-      C262 28 215 16 160 16 Z"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 480" role="img" aria-label="Habsan Achievers Academy Gajiri official crest">
+  <!-- Exact crest recreation: ACHIEVERS above; cap + diploma scroll + book; mirrored ACADEMY -->
+  <g fill="none" stroke="#0B4D2C" stroke-width="5" stroke-linejoin="round" stroke-linecap="round">
+    <!-- Outer shield -->
+    <path d="M200 78
+      C138 78 82 92 68 112
+      V198
+      C68 292 122 360 200 418
+      C278 360 332 292 332 198
+      V112
+      C318 92 262 78 200 78 Z"/>
+  </g>
+  <!-- Inner shield -->
+  <path fill="none" stroke="#0B4D2C" stroke-width="2.4" d="M200 96
+    C148 96 102 108 90 122
+    V196
+    C90 278 136 336 200 386
+    C264 336 310 278 310 196
+    V122
+    C298 108 252 96 200 96 Z"/>
+
+  <!-- ACHIEVERS above shield -->
+  <text x="200" y="48" text-anchor="middle" fill="#0B4D2C"
+        font-family="Arial Black, Arial, Helvetica, sans-serif"
+        font-size="28" font-weight="900" letter-spacing="4">ACHIEVERS</text>
+
+  <!-- HABSAN left: bottom-to-top (rotate -90) -->
+  <text fill="#0B4D2C" font-family="Arial Black, Arial, Helvetica, sans-serif"
+        font-size="16" font-weight="800" letter-spacing="3"
+        transform="translate(98 300) rotate(-90)">HABSAN</text>
+
+  <!-- ACADEMY right: top-to-bottom with mirrored letters (scale -1 on X after rotate) -->
+  <g transform="translate(302 140) rotate(90) scale(-1,1)">
+    <text fill="#0B4D2C" font-family="Arial Black, Arial, Helvetica, sans-serif"
+          font-size="16" font-weight="800" letter-spacing="3"
+          text-anchor="end" dominant-baseline="middle">ACADEMY</text>
   </g>
 
-  <!-- Inner rim -->
-  <path fill="none" stroke="#0b4d2c" stroke-width="2" d="M160 32
-    C114 32 74 42 62 54
-    V150
-    C62 222 100 278 160 328
-    C220 278 258 222 258 150
-    V54
-    C246 42 206 32 160 32 Z"/>
-
-  <!-- ACHIEVERS along top -->
-  <path id="achieversArc" d="M84 82 Q160 50 236 82" fill="none"/>
-  <text fill="#0b4d2c" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="15" font-weight="800" letter-spacing="1.5">
-    <textPath href="#achieversArc" startOffset="50%" text-anchor="middle">ACHIEVERS</textPath>
-  </text>
-
-  <!-- Side words -->
-  <text fill="#0b4d2c" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="2"
-        transform="translate(72 228) rotate(-90)">HABSAN</text>
-  <text fill="#0b4d2c" font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="14" font-weight="800" letter-spacing="2"
-        transform="translate(252 112) rotate(90)">ACADEMY</text>
-
-  <!-- Graduation cap (tassel hangs left) -->
-  <g fill="#0b4d2c" stroke="none">
-    <polygon points="160,98 108,116 160,134 212,116"/>
-    <rect x="148" y="122" width="24" height="14"/>
+  <!-- Graduation cap -->
+  <g fill="#0B4D2C" stroke="none">
+    <polygon points="200,138 148,156 200,174 252,156"/>
+    <rect x="188" y="162" width="24" height="14"/>
   </g>
-  <path fill="none" stroke="#0b4d2c" stroke-width="3.5" stroke-linecap="round"
-        d="M108 116 V138 C108 148 124 154 136 154"/>
-  <circle cx="136" cy="154" r="4.5" fill="#0b4d2c"/>
+  <!-- Tassel hangs LEFT -->
+  <path fill="none" stroke="#0B4D2C" stroke-width="3.5" stroke-linecap="round"
+        d="M148 156 V182 C148 192 162 198 174 198"/>
+  <circle cx="174" cy="198" r="4.5" fill="#0B4D2C"/>
 
-  <!-- Diploma scroll diagonal -->
-  <g transform="translate(160 176) rotate(-32)" fill="none" stroke="#0b4d2c" stroke-width="3.5" stroke-linecap="round">
-    <rect x="-46" y="-11" width="92" height="22" rx="10"/>
-    <path d="M-46 -11 C-58 -11 -58 11 -46 11"/>
-    <path d="M46 -11 C58 -11 58 11 46 11"/>
-    <path stroke-width="2.5" d="M-22 0 H22"/>
+  <!-- Rolled diploma / scroll (diagonal) -->
+  <g transform="translate(200 220) rotate(-34)" fill="none" stroke="#0B4D2C" stroke-width="3.6" stroke-linecap="round">
+    <!-- tube body -->
+    <rect x="-52" y="-12" width="104" height="24" rx="12"/>
+    <!-- left roll end -->
+    <ellipse cx="-52" cy="0" rx="10" ry="12"/>
+    <!-- right roll end -->
+    <ellipse cx="52" cy="0" rx="10" ry="12"/>
+    <!-- paper lines -->
+    <path stroke-width="2.2" d="M-28 0 H28"/>
+    <path stroke-width="1.8" d="M-20 -5 H20 M-20 5 H20"/>
   </g>
 
   <!-- Open book -->
-  <g fill="none" stroke="#0b4d2c" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round">
-    <path d="M108 236 Q160 208 212 236 L212 268 Q160 246 108 268 Z"/>
-    <path d="M160 214 V258"/>
-    <path stroke-width="2.2" d="M120 236 H144 M120 246 H142 M120 256 H140"/>
-    <path stroke-width="2.2" d="M176 236 H200 M178 246 H200 M180 256 H200"/>
+  <g fill="none" stroke="#0B4D2C" stroke-width="3.6" stroke-linejoin="round" stroke-linecap="round">
+    <path d="M138 278 Q200 248 262 278 L262 312 Q200 288 138 312 Z"/>
+    <path d="M200 254 V300"/>
+    <path stroke-width="2.2" d="M152 278 H180 M152 288 H178 M152 298 H176"/>
+    <path stroke-width="2.2" d="M220 278 H248 M222 288 H248 M224 298 H248"/>
   </g>
 
   <!-- GAJIRI -->
-  <text x="160" y="302" text-anchor="middle" fill="#0b4d2c"
-        font-family="Arial Black, Arial, Helvetica, sans-serif" font-size="18" font-weight="800" letter-spacing="3">GAJIRI</text>
+  <text x="200" y="352" text-anchor="middle" fill="#0B4D2C"
+        font-family="Arial Black, Arial, Helvetica, sans-serif"
+        font-size="20" font-weight="900" letter-spacing="4">GAJIRI</text>
 
   <!-- Motto ribbon -->
-  <path fill="#0b4d2c" d="M28 332 H292 L276 368 H44 Z"/>
-  <path fill="#0b4d2c" d="M28 332 L10 350 L28 368 Z"/>
-  <path fill="#0b4d2c" d="M292 332 L310 350 L292 368 Z"/>
-  <text x="160" y="355" text-anchor="middle" fill="#ffffff"
-        font-family="Arial, Helvetica, sans-serif" font-size="11.5" font-weight="800" letter-spacing="0.6">
+  <path fill="#0B4D2C" d="M42 400 H358 L338 442 H62 Z"/>
+  <path fill="#0B4D2C" d="M42 400 L20 422 L42 442 Z"/>
+  <path fill="#0B4D2C" d="M358 400 L380 422 L358 442 Z"/>
+  <text x="200" y="428" text-anchor="middle" fill="#FFFFFF"
+        font-family="Arial, Helvetica, sans-serif"
+        font-size="12.5" font-weight="800" letter-spacing="0.8">
     MOTTO: KNOWLEDGE, DISCIPLINE &amp; EXCELLENCE
   </text>
 </svg>
