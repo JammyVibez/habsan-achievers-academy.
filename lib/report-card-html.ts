@@ -83,8 +83,8 @@ export function buildReportCardHtml(
       --muted: #475569;
       --line: #94a3b8;
       --soft: #f1f5f0;
-      --green: #14532d;
-      --green-deep: #0f3d1e;
+      --green: #0b4d2c;
+      --green-deep: #0b4d2c;
       --gold: #b45309;
     }
     * { box-sizing: border-box; }
