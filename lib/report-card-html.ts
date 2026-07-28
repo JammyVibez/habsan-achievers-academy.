@@ -45,7 +45,7 @@ export function buildReportCardHtml(
   options: BuildReportCardHtmlOptions = {},
 ): string {
   const origin = (options.assetOrigin ?? '').replace(/\/$/, '');
-  const logoSrc = `${origin}${SCHOOL_BRAND.logoPath}`;
+  const logoSrc = `${origin}${SCHOOL_BRAND.logoPrintPath ?? SCHOOL_BRAND.logoPath}`;
   const autoPrint = Boolean(options.autoPrint);
 
   const rows = data.results
