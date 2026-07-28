@@ -8,11 +8,11 @@ import { Label } from '@/components/ui/label';
 import { AlertCircle, Download, Loader, Eye, EyeOff, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
-import Image from 'next/image';
 import { SessionTermPicker } from '@/components/academic/session-term-picker';
 import type { AcademicSessionOption } from '@/lib/academic-calendar-types';
 import { ReportCardView, type ReportCardViewData } from '@/components/results/report-card-view';
 import { SCHOOL_BRAND, schoolPhoneLine } from '@/lib/school-brand';
+import { SchoolLogo } from '@/components/brand/school-logo';
 
 function openReportCardHtml(html: string) {
   const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
@@ -142,14 +142,7 @@ export function AdvancedResultChecker() {
         <Card className="overflow-hidden border-emerald-900/15 shadow-md">
           <div className="border-b border-emerald-900/10 bg-[radial-gradient(circle_at_top_left,rgba(20,83,45,0.12),transparent_45%),linear-gradient(180deg,#f7faf5,#fff)] px-6 py-6">
             <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
-              <Image
-                src={SCHOOL_BRAND.logoPath}
-                alt={`${SCHOOL_BRAND.shortName} logo`}
-                width={72}
-                height={80}
-                className="h-16 w-auto"
-                priority
-              />
+              <SchoolLogo size={72} priority />
               <div className="sm:flex-1">
                 <p className="font-serif text-lg font-bold uppercase tracking-wide text-emerald-950 sm:text-xl">
                   {SCHOOL_BRAND.shortName}

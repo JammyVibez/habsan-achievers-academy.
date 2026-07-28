@@ -58,6 +58,10 @@ export type PublicSiteContent = {
     sessionDurationMinutes: number;
     auditLogging: boolean;
   };
+  [SITE_CONTENT_KEYS.schoolBranding]: {
+    /** Public URL or site path for the school crest/logo */
+    logoUrl: string;
+  };
 };
 
 export function getDefaultPublicSiteContent(): PublicSiteContent {
@@ -158,6 +162,9 @@ export function getDefaultPublicSiteContent(): PublicSiteContent {
       sessionTimeout: true,
       sessionDurationMinutes: 30,
       auditLogging: true,
+    },
+    [SITE_CONTENT_KEYS.schoolBranding]: {
+      logoUrl: '/school-logo.png',
     },
   };
 }

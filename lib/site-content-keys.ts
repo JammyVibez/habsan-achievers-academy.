@@ -8,6 +8,7 @@ export const SITE_CONTENT_KEYS = {
   admissions: 'admissions_info',
   idCard: 'id_card_design',
   systemSettings: 'system_settings',
+  schoolBranding: 'school_branding',
 } as const;
 
 export type SiteContentKey = (typeof SITE_CONTENT_KEYS)[keyof typeof SITE_CONTENT_KEYS];

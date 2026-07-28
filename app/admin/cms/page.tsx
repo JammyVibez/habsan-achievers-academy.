@@ -8,6 +8,7 @@ import { GalleryCmsEditor } from "@/components/admin/cms/gallery-cms-editor"
 import { CoreValuesEditor } from "@/components/admin/cms/core-values-editor"
 import { AdmissionsInfoEditor } from "@/components/admin/cms/admissions-info-editor"
 import { IdCardEditor } from "@/components/admin/cms/id-card-editor"
+import { SchoolLogoEditor } from "@/components/admin/cms/school-logo-editor"
 
 export default function CMSPage() {
   return (
@@ -19,8 +20,9 @@ export default function CMSPage() {
         </p>
       </div>
 
-      <Tabs defaultValue="hero" className="space-y-6">
+      <Tabs defaultValue="logo" className="space-y-6">
         <TabsList className="flex flex-wrap h-auto gap-1">
+          <TabsTrigger value="logo">School Logo</TabsTrigger>
           <TabsTrigger value="hero">Hero Carousel</TabsTrigger>
           <TabsTrigger value="principal">Principal Message</TabsTrigger>
           <TabsTrigger value="about">About Us</TabsTrigger>
@@ -30,6 +32,10 @@ export default function CMSPage() {
           <TabsTrigger value="core">Core values</TabsTrigger>
           <TabsTrigger value="id-card">ID card</TabsTrigger>
         </TabsList>
+
+        <TabsContent value="logo">
+          <SchoolLogoEditor />
+        </TabsContent>
 
         <TabsContent value="hero">
           <HeroCarouselEditor />

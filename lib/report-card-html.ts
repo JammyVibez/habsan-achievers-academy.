@@ -38,6 +38,8 @@ export type BuildReportCardHtmlOptions = {
   /** Absolute origin for logo/assets when opening print window, e.g. https://example.com */
   assetOrigin?: string;
   autoPrint?: boolean;
+  /** Override logo URL (CMS upload). Absolute or site-relative. */
+  logoUrl?: string;
 };
 
 export function buildReportCardHtml(
@@ -45,7 +47,13 @@ export function buildReportCardHtml(
   options: BuildReportCardHtmlOptions = {},
 ): string {
   const origin = (options.assetOrigin ?? '').replace(/\/$/, '');
-  const logoSrc = `${origin}${SCHOOL_BRAND.logoPrintPath ?? SCHOOL_BRAND.logoPath}`;
+  const configuredLogo =
+    (options.logoUrl && options.logoUrl.trim()) ||
+    SCHOOL_BRAND.logoPrintPath ||
+    SCHOOL_BRAND.logoPath;
+  const logoSrc = /^https?:\/\//i.test(configuredLogo) || configuredLogo.startsWith('data:')
+    ? configuredLogo
+    : `${origin}${configuredLogo.startsWith('/') ? configuredLogo : `/${configuredLogo}`}`;
   const autoPrint = Boolean(options.autoPrint);
 
   const rows = data.results

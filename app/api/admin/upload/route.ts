@@ -1,6 +1,8 @@
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { randomUUID } from 'crypto';
+import { mkdir, writeFile } from 'fs/promises';
+import path from 'path';
 import { requireAdminFromRequest } from '@/lib/require-admin-api';
 import {
   ALLOWED_IMAGE_TYPES,
@@ -12,20 +14,23 @@ import { ensureStorageBucket, getStorageBucketName, getSupabaseAdmin } from '@/l
 
 export const dynamic = 'force-dynamic';
 
+async function saveLocalUpload(buffer: Buffer, ext: string, mime: string) {
+  const uploadsDir = path.join(process.cwd(), 'public', 'uploads');
+  await mkdir(uploadsDir, { recursive: true });
+  const filename = `${randomUUID()}${ext}`;
+  await writeFile(path.join(uploadsDir, filename), buffer);
+  return {
+    url: `/uploads/${filename}`,
+    mime,
+    size: buffer.length,
+    bucket: 'local',
+    path: `uploads/${filename}`,
+  };
+}
+
 export async function POST(request: NextRequest) {
   const admin = await requireAdminFromRequest(request);
   if (!admin.ok) return admin.response;
-
-  const supabase = getSupabaseAdmin();
-  if (!supabase) {
-    return NextResponse.json(
-      {
-        error:
-          'Supabase Storage is not configured. Set SUPABASE_URL (or NEXT_PUBLIC_SUPABASE_URL), SUPABASE_SERVICE_ROLE_KEY, and create a public bucket (see .env.example).',
-      },
-      { status: 503 },
-    );
-  }
 
   let formData: FormData;
   try {
@@ -43,7 +48,7 @@ export async function POST(request: NextRequest) {
   const allowed = ALLOWED_IMAGE_TYPES.has(mime) || ALLOWED_VIDEO_TYPES.has(mime);
   if (!allowed) {
     return NextResponse.json(
-      { error: 'Unsupported file type. Use JPEG, PNG, WebP, GIF, MP4, WebM, or MOV.' },
+      { error: 'Unsupported file type. Use JPEG, PNG, WebP, GIF, SVG, MP4, WebM, or MOV.' },
       { status: 400 },
     );
   }
@@ -62,6 +67,25 @@ export async function POST(request: NextRequest) {
   }
 
   const buffer = Buffer.from(await file.arrayBuffer());
+  const supabase = getSupabaseAdmin();
+
+  // Prefer Supabase when configured; otherwise persist under /public/uploads for local/dev.
+  if (!supabase) {
+    try {
+      const local = await saveLocalUpload(buffer, ext, mime);
+      return NextResponse.json(local);
+    } catch (error) {
+      console.error('Local upload error:', error);
+      return NextResponse.json(
+        {
+          error:
+            'Storage is not configured and local upload failed. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY, or ensure the server can write to public/uploads.',
+        },
+        { status: 503 },
+      );
+    }
+  }
+
   const bucket = getStorageBucketName();
   const objectPath = `cms/${randomUUID()}${ext}`;
 
@@ -82,13 +106,19 @@ export async function POST(request: NextRequest) {
       const ensured = await ensureStorageBucket(supabase, bucket);
       if (!ensured.ok) {
         console.error('Supabase create bucket failed:', ensured.message);
-        return NextResponse.json(
-          {
-            error: `Could not create storage bucket "${bucket}": ${ensured.message}. Check the service role key and Storage permissions in Supabase.`,
-            bucket,
-          },
-          { status: 502 },
-        );
+        // Fall back to local disk so logo uploads still work.
+        try {
+          const local = await saveLocalUpload(buffer, ext, mime);
+          return NextResponse.json({ ...local, warning: `Supabase bucket unavailable: ${ensured.message}` });
+        } catch {
+          return NextResponse.json(
+            {
+              error: `Could not create storage bucket "${bucket}": ${ensured.message}. Check the service role key and Storage permissions in Supabase.`,
+              bucket,
+            },
+            { status: 502 },
+          );
+        }
       }
       const retry = await supabase.storage.from(bucket).upload(objectPath, buffer, uploadOpts);
       uploadError = retry.error;
@@ -97,13 +127,21 @@ export async function POST(request: NextRequest) {
 
   if (uploadError) {
     console.error('Supabase upload error:', uploadError);
-    return NextResponse.json(
-      {
-        error: uploadError.message || 'Upload to storage failed. Check bucket policies and file path.',
-        bucket,
-      },
-      { status: 502 },
-    );
+    try {
+      const local = await saveLocalUpload(buffer, ext, mime);
+      return NextResponse.json({
+        ...local,
+        warning: uploadError.message || 'Supabase upload failed; saved locally instead.',
+      });
+    } catch {
+      return NextResponse.json(
+        {
+          error: uploadError.message || 'Upload to storage failed. Check bucket policies and file path.',
+          bucket,
+        },
+        { status: 502 },
+      );
+    }
   }
 
   const { data: publicData } = supabase.storage.from(bucket).getPublicUrl(objectPath);

@@ -129,6 +129,11 @@ export async function fetchMergedPublicSiteContent(): Promise<PublicSiteContent>
         ...out[SITE_CONTENT_KEYS.systemSettings],
         ...(p as Record<string, unknown>),
       } as PublicSiteContent[typeof SITE_CONTENT_KEYS.systemSettings];
+    } else if (row.key === SITE_CONTENT_KEYS.schoolBranding) {
+      const logoUrl = (p as { logoUrl?: unknown }).logoUrl;
+      if (typeof logoUrl === 'string' && logoUrl.trim()) {
+        out[SITE_CONTENT_KEYS.schoolBranding] = { logoUrl: logoUrl.trim() };
+      }
     }
   }
 

@@ -1,8 +1,8 @@
 'use client';
 
-import Image from 'next/image';
 import { SCHOOL_BRAND, schoolPhoneLine } from '@/lib/school-brand';
 import { NIGERIAN_GRADING_SCALE } from '@/lib/grading';
+import { SchoolLogo } from '@/components/brand/school-logo';
 
 export type ReportCardViewData = {
   studentName: string;
@@ -93,14 +93,7 @@ export function ReportCardView({ data }: { data: ReportCardViewData }) {
     <article className="overflow-hidden rounded-xl border border-emerald-900/15 bg-[radial-gradient(circle_at_12%_8%,rgba(20,83,45,0.07),transparent_42%),radial-gradient(circle_at_88%_0%,rgba(180,83,9,0.05),transparent_36%),#fff] shadow-sm">
       <header className="border-b-[3px] border-double border-emerald-950 px-4 py-5 sm:px-6">
         <div className="flex flex-col items-center gap-4 sm:flex-row sm:items-center sm:gap-5">
-          <Image
-            src={SCHOOL_BRAND.logoPath}
-            alt={`${SCHOOL_BRAND.shortName} logo`}
-            width={88}
-            height={96}
-            className="h-20 w-auto sm:h-24"
-            priority
-          />
+          <SchoolLogo size={88} priority />
           <div className="text-center sm:flex-1">
             <h2 className="font-serif text-xl font-bold uppercase tracking-wide text-emerald-950 sm:text-2xl">
               {SCHOOL_BRAND.name}
