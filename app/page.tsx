@@ -8,6 +8,8 @@ import { CTASection } from "@/components/home/cta-section"
 import { TestimonialsSection } from "@/components/home/testimonials-section"
 import { LatestNewsSection } from "@/components/home/latest-news-section"
 
+export const dynamic = "force-dynamic"
+
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col">

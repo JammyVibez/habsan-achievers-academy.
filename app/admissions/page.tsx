@@ -5,6 +5,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowRight, FileText, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
+export const dynamic = "force-dynamic"
+
 export default function AdmissionsPage() {
   return (
     <div className="flex min-h-screen flex-col">
