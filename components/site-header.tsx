@@ -4,6 +4,7 @@ import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Menu, X } from "lucide-react"
 import { useState } from "react"
+import { SchoolLogo } from "@/components/brand/school-logo"
 
 export function SiteHeader() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -12,13 +13,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-            HAA
-          </div>
-          <div className="hidden sm:block">
-            <div className="font-heading font-bold text-lg leading-tight">HABSAN ACHIEVERS</div>
-            <div className="text-xs text-muted-foreground">ACADEMY</div>
-          </div>
+          <SchoolLogo size={44} priority showWordmark wordmarkClassName="hidden sm:block" />
         </Link>
 
         {/* Desktop Navigation */}

@@ -14,6 +14,7 @@ import {
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { dashboardLogout } from "@/lib/dashboard-logout"
+import { SchoolLogo } from "@/components/brand/school-logo"
 
 const menuItems = [
   { icon: LayoutDashboard, label: "Dashboard", href: "/student" },
@@ -38,9 +39,7 @@ export function StudentSidebar({
     <aside className={cn("w-64 border-r border-border bg-card flex flex-col", className)}>
       <div className="p-6 border-b border-border">
         <Link href="/student" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-primary-foreground font-bold text-lg">
-            HAA
-          </div>
+          <SchoolLogo size={40} />
           <div>
             <div className="font-heading font-bold text-sm leading-tight">Student Portal</div>
             <div className="text-xs text-muted-foreground">HABSAN ACHIEVERS</div>

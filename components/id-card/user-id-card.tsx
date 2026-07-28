@@ -1,10 +1,12 @@
 'use client';
 
 import { useRef, useState } from 'react';
+import Image from 'next/image';
 import html2canvas from 'html2canvas';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2, Share2 } from 'lucide-react';
+import { SCHOOL_BRAND } from '@/lib/school-brand';
 
 type IdCardDesign = {
   schoolName: string;
@@ -111,11 +113,14 @@ export function UserIdCard({
       >
         <div className="mb-5 flex items-start justify-between gap-3">
           <div className="flex items-center gap-3">
-            <div
-              className="flex h-12 w-12 items-center justify-center rounded-xl text-sm font-bold"
-              style={{ backgroundColor: design.accentColor, color: '#ffffff' }}
-            >
-              {design.logoText}
+            <div className="flex h-14 w-12 shrink-0 items-center justify-center overflow-hidden rounded-md bg-white">
+              <Image
+                src={SCHOOL_BRAND.logoPath}
+                alt={`${design.schoolName} logo`}
+                width={48}
+                height={56}
+                className="h-12 w-auto object-contain"
+              />
             </div>
             <div>
               <p className="text-sm font-semibold">{design.schoolName}</p>
