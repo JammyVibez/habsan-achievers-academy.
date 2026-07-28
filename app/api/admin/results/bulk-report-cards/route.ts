@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       take: 500,
     });
 
+    const assetOrigin = new URL(request.url).origin;
     const cards = [];
     for (const s of students) {
       const payload = await buildReportCardForStudent(s.id, String(termId), String(sessionId));
@@ -30,7 +31,7 @@ export async function POST(request: NextRequest) {
       cards.push({
         studentId: s.id,
         admissionNumber: s.admissionNumber,
-        html: buildReportCardHtml(payload),
+        html: buildReportCardHtml(payload, { assetOrigin }),
         hasResults: payload.results.length > 0,
       });
     }

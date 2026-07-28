@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { listAcademicSessionOptions, resolveSessionAndTerm } from '@/lib/academic-calendar';
 import { buildReportCardForStudent, getCurrentTermAndSession } from '@/lib/report-card';
 import { validateResultCheckingPin } from '@/lib/issued-result-pin';
+import { isAcceptedAdmissionNumber, normalizeAdmissionNumber } from '@/lib/admission-number';
 
 export async function GET() {
   const sessions = await listAcademicSessionOptions();
@@ -26,9 +27,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'PIN and admission number are required' }, { status: 400 });
     }
 
-    const admissionPattern = /^HAA\/\d{4}\/\d{3}$/;
-    if (!admissionPattern.test(admissionNumber)) {
-      return NextResponse.json({ error: 'Invalid admission number format' }, { status: 400 });
+    const normalizedAdmission = normalizeAdmissionNumber(String(admissionNumber));
+    if (!isAcceptedAdmissionNumber(normalizedAdmission)) {
+      return NextResponse.json(
+        { error: 'Invalid admission number format. Use HAA/YYYY/### (e.g. HAA/2024/001).' },
+        { status: 400 },
+      );
     }
 
     const pinCheck = await validateResultCheckingPin(String(pin));
@@ -40,7 +44,7 @@ export async function POST(request: NextRequest) {
     }
 
     const student = await prisma.student.findUnique({
-      where: { admissionNumber },
+      where: { admissionNumber: normalizedAdmission },
       include: { user: true },
     });
 

@@ -5,42 +5,29 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { AlertCircle, CheckCircle, Download, Loader, Eye, EyeOff, Info } from 'lucide-react';
+import { AlertCircle, Download, Loader, Eye, EyeOff, Info } from 'lucide-react';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import Link from 'next/link';
+import Image from 'next/image';
 import { SessionTermPicker } from '@/components/academic/session-term-picker';
 import type { AcademicSessionOption } from '@/lib/academic-calendar-types';
+import { ReportCardView, type ReportCardViewData } from '@/components/results/report-card-view';
+import { SCHOOL_BRAND, schoolPhoneLine } from '@/lib/school-brand';
 
-interface ResultData {
-  studentName: string;
-  admissionNumber: string;
-  className: string;
-  academicSession: string;
-  term: string;
-  results: Array<{
-    subject: string;
-    ca1: number;
-    ca2: number;
-    exam: number;
-    total: number;
-    score: number;
-    grade: string;
-    comment: string;
-  }>;
-  gpa: number;
-  overallGrade: string;
-  position: string;
-  attendance: {
-    daysPresent: number;
-    daysAbsent: number;
-    daysLate: number;
-  };
-  conduct: string;
-  comments: string;
+function openReportCardHtml(html: string) {
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w) {
+    URL.revokeObjectURL(url);
+    throw new Error('Pop-up blocked. Allow pop-ups to download/print the report card.');
+  }
+  // Revoke after the new tab has a chance to load.
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 export function AdvancedResultChecker() {
-  const [step, setStep] = useState<'input' | 'results' | 'download'>('input');
+  const [step, setStep] = useState<'input' | 'results'>('input');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showPin, setShowPin] = useState(false);
@@ -50,7 +37,7 @@ export function AdvancedResultChecker() {
     admissionNumber: '',
   });
 
-  const [results, setResults] = useState<ResultData | null>(null);
+  const [results, setResults] = useState<ReportCardViewData | null>(null);
   const [sessionTermOptions, setSessionTermOptions] = useState<AcademicSessionOption[]>([]);
   const [selectedSessionId, setSelectedSessionId] = useState('');
   const [selectedTermId, setSelectedTermId] = useState('');
@@ -138,16 +125,10 @@ export function AdvancedResultChecker() {
       }
 
       if (typeof data.html === 'string' && data.html.length > 0) {
-        const w = window.open('', '_blank');
-        if (w) {
-          w.document.write(data.html);
-          w.document.close();
-          w.focus();
-        }
+        openReportCardHtml(data.html);
       } else {
         throw new Error('Report card HTML was empty');
       }
-
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to download PDF');
     } finally {
@@ -155,43 +136,47 @@ export function AdvancedResultChecker() {
     }
   }
 
-  const getGradeColor = (grade: string) => {
-    switch (grade) {
-      case 'A':
-        return 'bg-green-100 text-green-800';
-      case 'B':
-        return 'bg-blue-100 text-blue-800';
-      case 'C':
-        return 'bg-yellow-100 text-yellow-800';
-      case 'D':
-        return 'bg-orange-100 text-orange-800';
-      case 'F':
-        return 'bg-red-100 text-red-800';
-      default:
-        return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
-    <div className="w-full max-w-2xl mx-auto">
-      {/* Input Step */}
+    <div className="w-full max-w-5xl mx-auto">
       {step === 'input' && (
-        <Card>
+        <Card className="overflow-hidden border-emerald-900/15 shadow-md">
+          <div className="border-b border-emerald-900/10 bg-[radial-gradient(circle_at_top_left,rgba(20,83,45,0.12),transparent_45%),linear-gradient(180deg,#f7faf5,#fff)] px-6 py-6">
+            <div className="flex flex-col items-center gap-3 text-center sm:flex-row sm:text-left">
+              <Image
+                src={SCHOOL_BRAND.logoPath}
+                alt={`${SCHOOL_BRAND.shortName} logo`}
+                width={72}
+                height={80}
+                className="h-16 w-auto"
+                priority
+              />
+              <div className="sm:flex-1">
+                <p className="font-serif text-lg font-bold uppercase tracking-wide text-emerald-950 sm:text-xl">
+                  {SCHOOL_BRAND.shortName}
+                </p>
+                <p className="text-xs text-slate-600 sm:text-sm">{SCHOOL_BRAND.address}</p>
+                <p className="text-xs italic text-emerald-800">Motto: {SCHOOL_BRAND.motto}</p>
+              </div>
+            </div>
+          </div>
           <CardHeader>
             <CardTitle>Check Your Results</CardTitle>
-            <CardDescription>Enter your admission number and result checking PIN to view your results</CardDescription>
+            <CardDescription>
+              Enter your admission number and result checking PIN to view and download your end-of-term
+              result.
+            </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Info Alert */}
-            <Alert className="bg-blue-50 border-blue-200">
-              <Info className="h-4 w-4 text-blue-600" />
-              <AlertDescription className="text-blue-900">
-                You need a Result Checking PIN to access your results. PIN shop is disabled; get one from school admin if you don&apos;t have one.
+            <Alert className="border-emerald-200 bg-emerald-50">
+              <Info className="h-4 w-4 text-emerald-700" />
+              <AlertDescription className="text-emerald-950">
+                Result Checking PIN is required. Contact the school office ({schoolPhoneLine()}) or visit
+                the PIN shop if you do not have one.
               </AlertDescription>
             </Alert>
 
             {error && (
-              <Alert className="bg-red-50 border-red-200">
+              <Alert className="border-red-200 bg-red-50">
                 <AlertCircle className="h-4 w-4 text-red-600" />
                 <AlertDescription className="text-red-900">{error}</AlertDescription>
               </Alert>
@@ -204,7 +189,9 @@ export function AdvancedResultChecker() {
                 <Input
                   id="admission"
                   value={formData.admissionNumber}
-                  onChange={(e) => setFormData({ ...formData, admissionNumber: e.target.value.toUpperCase() })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, admissionNumber: e.target.value.toUpperCase() })
+                  }
                   placeholder="HAA/2024/001"
                   disabled={loading}
                   className="font-mono"
@@ -243,8 +230,8 @@ export function AdvancedResultChecker() {
                 <p className="text-xs text-muted-foreground">Format: XXXX-XXXX-XXXX</p>
               </div>
 
-              <div className="pt-4 border-t">
-                <p className="text-sm font-semibold mb-3">Don&apos;t have a PIN?</p>
+              <div className="border-t pt-4">
+                <p className="mb-3 text-sm font-semibold">Don&apos;t have a PIN?</p>
                 <Link href="/pin-shop">
                   <Button type="button" variant="outline" className="w-full">
                     Where to get Result PIN
@@ -252,14 +239,20 @@ export function AdvancedResultChecker() {
                 </Link>
               </div>
 
-              <Button 
-                type="submit" 
-                disabled={loading || !formData.admissionNumber || !formData.pin || !selectedSessionId || !selectedTermId} 
-                className="w-full bg-purple-600 hover:bg-purple-700"
+              <Button
+                type="submit"
+                disabled={
+                  loading ||
+                  !formData.admissionNumber ||
+                  !formData.pin ||
+                  !selectedSessionId ||
+                  !selectedTermId
+                }
+                className="w-full bg-emerald-900 hover:bg-emerald-800"
               >
                 {loading ? (
                   <>
-                    <Loader className="w-4 h-4 mr-2 animate-spin" />
+                    <Loader className="mr-2 h-4 w-4 animate-spin" />
                     Checking...
                   </>
                 ) : (
@@ -271,145 +264,48 @@ export function AdvancedResultChecker() {
         </Card>
       )}
 
-      {/* Results Display Step */}
       {step === 'results' && results && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Academic Report Card</CardTitle>
-            <CardDescription>{results.academicSession} - {results.term}</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {error && (
-              <Alert variant="destructive">
-                <AlertCircle className="h-4 w-4" />
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+        <div className="space-y-4">
+          {error && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
 
-            {/* Student Info */}
-            <div className="grid grid-cols-2 gap-4 p-4 bg-gray-50 rounded-lg">
-              <div>
-                <p className="text-sm text-muted-foreground">Student Name</p>
-                <p className="font-semibold">{results.studentName}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Admission Number</p>
-                <p className="font-semibold font-mono">{results.admissionNumber}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Class</p>
-                <p className="font-semibold">{results.className}</p>
-              </div>
-              <div>
-                <p className="text-sm text-muted-foreground">Position</p>
-                <p className="font-semibold">{results.position}</p>
-              </div>
-            </div>
+          <ReportCardView data={results} />
 
-            {/* Results Table */}
-            <div>
-              <h3 className="font-semibold mb-3">Subject Results</h3>
-              <div className="overflow-x-auto">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="border-b bg-gray-50">
-                      <th className="text-left p-2">Subject</th>
-                      <th className="text-center p-2">CA1</th>
-                      <th className="text-center p-2">CA2</th>
-                      <th className="text-center p-2">Exam</th>
-                      <th className="text-center p-2">Total</th>
-                      <th className="text-center p-2">Grade</th>
-                      <th className="text-left p-2">Comment</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {results.results.map((result, idx) => (
-                      <tr key={idx} className="border-b">
-                        <td className="p-2">{result.subject}</td>
-                        <td className="text-center p-2 font-semibold">{result.ca1}</td>
-                        <td className="text-center p-2 font-semibold">{result.ca2}</td>
-                        <td className="text-center p-2 font-semibold">{result.exam}</td>
-                        <td className="text-center p-2 font-semibold">{result.total}</td>
-                        <td className="text-center p-2">
-                          <span className={`px-2 py-1 rounded text-sm font-semibold ${getGradeColor(result.grade)}`}>
-                            {result.grade}
-                          </span>
-                        </td>
-                        <td className="p-2 text-muted-foreground">{result.comment}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            </div>
-
-            {/* Summary */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="p-4 border rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">GPA</p>
-                <p className="text-3xl font-bold text-green-600">{results.gpa.toFixed(2)}</p>
-              </div>
-              <div className="p-4 border rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">Overall Grade</p>
-                <p className={`text-3xl font-bold ${getGradeColor(results.overallGrade).split(' ')[1]}`}>
-                  {results.overallGrade}
-                </p>
-              </div>
-              <div className="p-4 border rounded-lg text-center">
-                <p className="text-sm text-muted-foreground mb-2">Conduct</p>
-                <p className="text-2xl font-bold text-blue-600">{results.conduct}</p>
-              </div>
-            </div>
-
-            {/* Attendance */}
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <h4 className="font-semibold mb-2">Attendance</h4>
-              <div className="grid grid-cols-3 gap-4 text-sm">
-                <div>
-                  <p className="text-muted-foreground">Days Present</p>
-                  <p className="font-semibold text-green-600">{results.attendance.daysPresent}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Days Absent</p>
-                  <p className="font-semibold text-red-600">{results.attendance.daysAbsent}</p>
-                </div>
-                <div>
-                  <p className="text-muted-foreground">Days Late</p>
-                  <p className="font-semibold text-orange-600">{results.attendance.daysLate}</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Comments */}
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-sm font-semibold text-blue-900 mb-2">Class Teacher&apos;s Comment</p>
-              <p className="text-blue-800">{results.comments}</p>
-            </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={() => {
+          <div className="flex flex-col gap-2 sm:flex-row">
+            <Button
+              variant="outline"
+              onClick={() => {
                 setStep('input');
                 setResults(null);
-              }} className="flex-1">
-                Check Another Result
-              </Button>
-              <Button onClick={handleDownloadPDF} disabled={loading} className="flex-1 bg-green-600 hover:bg-green-700">
-                {loading ? (
-                  <>
-                    <Loader className="w-4 h-4 mr-2 animate-spin" />
-                    Generating PDF...
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4 mr-2" />
-                    Download Report Card
-                  </>
-                )}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+                setError(null);
+              }}
+              className="flex-1"
+            >
+              Check Another Result
+            </Button>
+            <Button
+              onClick={handleDownloadPDF}
+              disabled={loading}
+              className="flex-1 bg-emerald-900 hover:bg-emerald-800"
+            >
+              {loading ? (
+                <>
+                  <Loader className="mr-2 h-4 w-4 animate-spin" />
+                  Preparing PDF...
+                </>
+              ) : (
+                <>
+                  <Download className="mr-2 h-4 w-4" />
+                  Download / Print Report Card
+                </>
+              )}
+            </Button>
+          </div>
+        </div>
       )}
     </div>
   );

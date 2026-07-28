@@ -7,48 +7,19 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { AlertCircle, Download, Eye, EyeOff, Info, Loader, Search } from 'lucide-react';
+import { AlertCircle, Download, Eye, EyeOff, Info, Loader } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { ReportCardView, type ReportCardViewData } from '@/components/results/report-card-view';
 
-type ResultPayload = {
-  studentName: string;
-  admissionNumber: string;
-  className: string;
-  academicSession: string;
-  term: string;
-  results: Array<{
-    subject: string;
-    ca1: number;
-    ca2: number;
-    exam: number;
-    total: number;
-    score: number;
-    grade: string;
-    comment: string;
-  }>;
-  gpa: number;
-  overallGrade: string;
-  position: string;
-  attendance: { daysPresent: number; daysAbsent: number; daysLate: number };
-  conduct: string;
-  comments: string;
-};
-
-function gradeColor(grade: string) {
-  switch (grade) {
-    case 'A':
-      return 'bg-green-100 text-green-800';
-    case 'B':
-      return 'bg-blue-100 text-blue-800';
-    case 'C':
-      return 'bg-yellow-100 text-yellow-800';
-    case 'D':
-      return 'bg-orange-100 text-orange-800';
-    case 'F':
-      return 'bg-red-100 text-red-800';
-    default:
-      return 'bg-gray-100 text-gray-800';
+function openReportCardHtml(html: string) {
+  const blob = new Blob([html], { type: 'text/html;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if (!w) {
+    URL.revokeObjectURL(url);
+    throw new Error('Pop-up blocked. Allow pop-ups to download/print the report card.');
   }
+  setTimeout(() => URL.revokeObjectURL(url), 60_000);
 }
 
 export function StudentResultsPanel() {
@@ -62,8 +33,7 @@ export function StudentResultsPanel() {
   const [showPin, setShowPin] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [results, setResults] = useState<ResultPayload | null>(null);
-  const [subjectSearch, setSubjectSearch] = useState('');
+  const [results, setResults] = useState<ReportCardViewData | null>(null);
   const [sessionTermOptions, setSessionTermOptions] = useState<
     Array<{ id: string; sessionName: string; terms: Array<{ id: string; termName: string }> }>
   >([]);
@@ -121,7 +91,7 @@ export function StudentResultsPanel() {
         setError(data.error || 'Failed to load results');
         return;
       }
-      setResults(data.results as ResultPayload);
+      setResults(data.results as ReportCardViewData);
       setStep('results');
     } catch {
       setError('Failed to load results');
@@ -151,15 +121,10 @@ export function StudentResultsPanel() {
         return;
       }
       if (typeof data.html === 'string' && data.html.length > 0) {
-        const w = window.open('', '_blank');
-        if (w) {
-          w.document.write(data.html);
-          w.document.close();
-          w.focus();
-        }
+        openReportCardHtml(data.html);
       }
-    } catch {
-      setError('Failed to download PDF');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to download PDF');
     } finally {
       setLoading(false);
     }
@@ -168,7 +133,7 @@ export function StudentResultsPanel() {
   if (loadingProfile) {
     return (
       <Card>
-        <CardContent className="py-12 flex justify-center">
+        <CardContent className="flex justify-center py-12">
           <Loader className="h-8 w-8 animate-spin text-muted-foreground" />
         </CardContent>
       </Card>
@@ -186,7 +151,7 @@ export function StudentResultsPanel() {
 
   if (step === 'pin') {
     return (
-      <Card>
+      <Card className="border-emerald-900/15">
         <CardHeader>
           <CardTitle>View my results</CardTitle>
           <CardDescription>
@@ -195,11 +160,11 @@ export function StudentResultsPanel() {
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
-          <Alert className="bg-blue-50 border-blue-200">
-            <Info className="h-4 w-4 text-blue-600" />
-            <AlertDescription className="text-blue-900">
-              Without a valid Result PIN you cannot view results here or on the public checker — same PIN works for
-              both.
+          <Alert className="border-emerald-200 bg-emerald-50">
+            <Info className="h-4 w-4 text-emerald-700" />
+            <AlertDescription className="text-emerald-950">
+              Without a valid Result PIN you cannot view results here or on the public checker — same PIN
+              works for both.
             </AlertDescription>
           </Alert>
 
@@ -209,7 +174,8 @@ export function StudentResultsPanel() {
               <span className="font-mono font-medium">{admissionNumber}</span>
             </p>
             <p>
-              <span className="text-muted-foreground">Class:</span> <span className="font-medium">{classLevel}</span>
+              <span className="text-muted-foreground">Class:</span>{' '}
+              <span className="font-medium">{classLevel}</span>
             </p>
           </div>
 
@@ -251,11 +217,13 @@ export function StudentResultsPanel() {
                   <SelectValue placeholder="Select term" />
                 </SelectTrigger>
                 <SelectContent>
-                  {(sessionTermOptions.find((s) => s.id === selectedSessionId)?.terms ?? []).map((term) => (
-                    <SelectItem key={term.id} value={term.id}>
-                      {term.termName}
-                    </SelectItem>
-                  ))}
+                  {(sessionTermOptions.find((s) => s.id === selectedSessionId)?.terms ?? []).map(
+                    (term) => (
+                      <SelectItem key={term.id} value={term.id}>
+                        {term.termName}
+                      </SelectItem>
+                    ),
+                  )}
                 </SelectContent>
               </Select>
             </div>
@@ -285,7 +253,7 @@ export function StudentResultsPanel() {
             <Button
               type="submit"
               disabled={loading || !pin.trim() || !selectedSessionId || !selectedTermId}
-              className="w-full"
+              className="w-full bg-emerald-900 hover:bg-emerald-800"
             >
               {loading ? (
                 <>
@@ -307,113 +275,38 @@ export function StudentResultsPanel() {
   }
 
   if (!results) return null;
-  const normalizedSubjectSearch = subjectSearch.trim().toLowerCase();
-  const filteredResultRows = results.results.filter((r) => {
-    if (!normalizedSubjectSearch) return true;
-    return r.subject.toLowerCase().includes(normalizedSubjectSearch);
-  });
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Academic report</CardTitle>
-        <CardDescription>
-          {results.academicSession} — {results.term}
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertDescription>{error}</AlertDescription>
-          </Alert>
-        )}
+    <div className="space-y-4">
+      {error && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
 
-        <div className="grid grid-cols-2 gap-4 rounded-lg bg-muted/50 p-4 text-sm">
-          <div>
-            <p className="text-muted-foreground">Name</p>
-            <p className="font-semibold">{results.studentName}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Admission</p>
-            <p className="font-mono font-semibold">{results.admissionNumber}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">Class</p>
-            <p className="font-semibold">{results.className}</p>
-          </div>
-          <div>
-            <p className="text-muted-foreground">GPA</p>
-            <p className="font-semibold">{results.gpa.toFixed(2)}</p>
-          </div>
-        </div>
+      <ReportCardView data={results} />
 
-        <div className="space-y-3">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={subjectSearch}
-              onChange={(e) => setSubjectSearch(e.target.value)}
-              placeholder="Search subject..."
-              className="pl-9"
-            />
-          </div>
-        </div>
-
-        <div className="overflow-x-auto rounded-md border">
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="border-b bg-muted/60">
-                <th className="p-2 text-left">Subject</th>
-                <th className="p-2 text-center">CA1</th>
-                <th className="p-2 text-center">CA2</th>
-                <th className="p-2 text-center">Exam</th>
-                <th className="p-2 text-center">Total</th>
-                <th className="p-2 text-center">Grade</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredResultRows.map((r, idx) => (
-                <tr key={idx} className="border-b last:border-0">
-                  <td className="p-2">{r.subject}</td>
-                  <td className="p-2 text-center font-medium">{r.ca1}</td>
-                  <td className="p-2 text-center font-medium">{r.ca2}</td>
-                  <td className="p-2 text-center font-medium">{r.exam}</td>
-                  <td className="p-2 text-center font-semibold">{r.total}</td>
-                  <td className="p-2 text-center">
-                    <span className={`rounded px-2 py-0.5 text-xs font-semibold ${gradeColor(r.grade)}`}>
-                      {r.grade}
-                    </span>
-                  </td>
-                </tr>
-              ))}
-              {filteredResultRows.length === 0 ? (
-                <tr>
-                  <td colSpan={6} className="p-4 text-center text-muted-foreground">
-                    No subjects match your search.
-                  </td>
-                </tr>
-              ) : null}
-            </tbody>
-          </table>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          <Button
-            variant="outline"
-            onClick={() => {
-              setStep('pin');
-              setResults(null);
-            }}
-          >
-            Use another PIN
-          </Button>
-          <Button onClick={handleDownloadPDF} disabled={loading}>
-            <Download className="mr-2 h-4 w-4" />
-            {loading ? 'Working…' : 'Open report card'}
-          </Button>
-        </div>
-      </CardContent>
-    </Card>
+      <div className="flex flex-wrap gap-2">
+        <Button
+          variant="outline"
+          onClick={() => {
+            setStep('pin');
+            setResults(null);
+            setError(null);
+          }}
+        >
+          Use another PIN
+        </Button>
+        <Button
+          onClick={handleDownloadPDF}
+          disabled={loading}
+          className="bg-emerald-900 hover:bg-emerald-800"
+        >
+          <Download className="mr-2 h-4 w-4" />
+          {loading ? 'Working…' : 'Download / Print Report Card'}
+        </Button>
+      </div>
+    </div>
   );
 }
