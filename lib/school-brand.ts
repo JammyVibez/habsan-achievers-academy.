@@ -5,7 +5,7 @@ export const SCHOOL_BRAND = {
   address: 'Gajiri Tafa Local Govt, Niger State',
   phones: ['09023837175', '08036527117', '09052498332'],
   motto: 'Knowledge, Discipline & Excellence',
-  /** Official crest PNG used on report cards and website branding */
+  /** Official crest PNG (cap + diploma scroll + book) */
   logoPath: '/school-logo.png',
   /** Opaque white-background variant for print/PDF reliability */
   logoPrintPath: '/school-logo-print.png',
