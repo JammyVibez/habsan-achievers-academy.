@@ -3,6 +3,7 @@ import { Facebook, Twitter, Instagram, Mail, Phone, MapPin } from 'lucide-react'
 import { fetchMergedPublicSiteContent } from '@/lib/site-content-merge';
 import { SITE_CONTENT_KEYS } from '@/lib/site-content-keys';
 import { getDefaultPublicSiteContent } from '@/lib/site-content-defaults';
+import { SchoolLogo } from '@/components/brand/school-logo';
 
 export async function SiteFooter() {
   let contact = getDefaultPublicSiteContent()[SITE_CONTENT_KEYS.contact];
@@ -18,14 +19,8 @@ export async function SiteFooter() {
       <div className="container py-12">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4">
           <div>
-            <div className="mb-4 flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-lg font-bold text-primary-foreground">
-                HAA
-              </div>
-              <div>
-                <div className="font-heading text-sm font-bold leading-tight">HABSAN ACHIEVERS</div>
-                <div className="text-xs text-muted-foreground">ACADEMY</div>
-              </div>
+            <div className="mb-4">
+              <SchoolLogo size={48} showWordmark />
             </div>
             <p className="text-sm leading-relaxed text-muted-foreground">
               Nurturing excellence and building future leaders through quality education from Pre-Nursery to Secondary
