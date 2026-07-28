@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { requireAdminFromRequest } from '@/lib/require-admin-api';
 import { buildReportCardForStudent } from '@/lib/report-card';
 import { buildReportCardHtml } from '@/lib/report-card-html';
+import { resolveSchoolLogoUrl } from '@/lib/school-logo';
 
 export const dynamic = 'force-dynamic';
 
@@ -24,6 +25,7 @@ export async function POST(request: NextRequest) {
     });
 
     const assetOrigin = new URL(request.url).origin;
+    const logoUrl = await resolveSchoolLogoUrl();
     const cards = [];
     for (const s of students) {
       const payload = await buildReportCardForStudent(s.id, String(termId), String(sessionId));
@@ -31,7 +33,7 @@ export async function POST(request: NextRequest) {
       cards.push({
         studentId: s.id,
         admissionNumber: s.admissionNumber,
-        html: buildReportCardHtml(payload, { assetOrigin }),
+        html: buildReportCardHtml(payload, { assetOrigin, logoUrl }),
         hasResults: payload.results.length > 0,
       });
     }

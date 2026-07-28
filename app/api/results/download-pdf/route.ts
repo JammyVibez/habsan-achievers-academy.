@@ -5,6 +5,7 @@ import { buildReportCardForStudent } from '@/lib/report-card';
 import { buildReportCardHtml } from '@/lib/report-card-html';
 import { validateResultCheckingPin } from '@/lib/issued-result-pin';
 import { isAcceptedAdmissionNumber, normalizeAdmissionNumber } from '@/lib/admission-number';
+import { resolveSchoolLogoUrl } from '@/lib/school-logo';
 
 export async function POST(request: NextRequest) {
   try {
@@ -65,9 +66,11 @@ export async function POST(request: NextRequest) {
     }
 
     const assetOrigin = new URL(request.url).origin;
+    const logoUrl = await resolveSchoolLogoUrl();
     const reportCardHTML = buildReportCardHtml(payload, {
       assetOrigin,
       autoPrint: true,
+      logoUrl,
     });
 
     return NextResponse.json(

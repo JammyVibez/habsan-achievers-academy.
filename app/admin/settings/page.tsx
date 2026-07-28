@@ -2,6 +2,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { AcademicSettingsPanel } from '@/components/admin/academic-settings-panel';
 import { GeneralSettingsPanel } from '@/components/admin/general-settings-panel';
 import { SystemSettingsPanel } from '@/components/admin/system-settings-panel';
+import { SchoolLogoEditor } from '@/components/admin/cms/school-logo-editor';
 
 export default function SettingsPage() {
   return (
@@ -14,6 +15,7 @@ export default function SettingsPage() {
       <Tabs defaultValue="general" className="space-y-4">
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="logo">School Logo</TabsTrigger>
           <TabsTrigger value="academic">Academic</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="security">Security</TabsTrigger>
@@ -21,6 +23,10 @@ export default function SettingsPage() {
 
         <TabsContent value="general" className="space-y-4">
           <GeneralSettingsPanel />
+        </TabsContent>
+
+        <TabsContent value="logo" className="space-y-4">
+          <SchoolLogoEditor />
         </TabsContent>
 
         <TabsContent value="academic" className="space-y-4">
