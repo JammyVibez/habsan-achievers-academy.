@@ -57,9 +57,17 @@ function isStringArray(v: unknown): v is string[] {
 export async function fetchMergedPublicSiteContent(): Promise<PublicSiteContent> {
   const out = getDefaultPublicSiteContent();
   const keys = Object.values(SITE_CONTENT_KEYS) as string[];
-  const rows = await prisma.siteContentBlock.findMany({
-    where: { key: { in: keys } },
-  });
+
+  let rows: Array<{ key: string; payload: unknown }> = [];
+  try {
+    rows = await prisma.siteContentBlock.findMany({
+      where: { key: { in: keys } },
+    });
+  } catch (error) {
+    // Build/prerender or incomplete migrations should fall back to defaults.
+    console.warn('[site-content] using defaults; database unavailable:', error);
+    return out;
+  }
 
   for (const row of rows) {
     const p = row.payload;

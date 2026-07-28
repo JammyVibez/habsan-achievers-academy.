@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Bell, Calendar, Users } from 'lucide-react';
 import { listPublishedNotices } from '@/lib/notices';
 
+export const dynamic = 'force-dynamic';
+
 function getPriorityBadge(priority: string) {
   switch (priority) {
     case 'urgent':

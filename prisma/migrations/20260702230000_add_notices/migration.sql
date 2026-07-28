@@ -1,11 +1,18 @@
--- CreateEnum
-CREATE TYPE "NoticePriority" AS ENUM ('low', 'medium', 'high', 'urgent');
+-- CreateEnum (idempotent for partially applied / re-runnable deploys)
+DO $$ BEGIN
+  CREATE TYPE "NoticePriority" AS ENUM ('low', 'medium', 'high', 'urgent');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
--- CreateEnum
-CREATE TYPE "NoticeAudience" AS ENUM ('all', 'students', 'teachers', 'parents');
+DO $$ BEGIN
+  CREATE TYPE "NoticeAudience" AS ENUM ('all', 'students', 'teachers', 'parents');
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
 
 -- CreateTable
-CREATE TABLE "notices" (
+CREATE TABLE IF NOT EXISTS "notices" (
     "id" TEXT NOT NULL,
     "title" TEXT NOT NULL,
     "content" TEXT NOT NULL,
@@ -23,7 +30,11 @@ CREATE TABLE "notices" (
 );
 
 -- CreateIndex
-CREATE INDEX "notices_is_published_published_at_idx" ON "notices"("is_published", "published_at");
+CREATE INDEX IF NOT EXISTS "notices_is_published_published_at_idx" ON "notices"("is_published", "published_at");
 
 -- AddForeignKey
-ALTER TABLE "notices" ADD CONSTRAINT "notices_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+DO $$ BEGIN
+  ALTER TABLE "notices" ADD CONSTRAINT "notices_created_by_id_fkey" FOREIGN KEY ("created_by_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+EXCEPTION
+  WHEN duplicate_object THEN null;
+END $$;
