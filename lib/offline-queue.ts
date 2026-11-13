@@ -52,7 +52,9 @@ const queueListeners = new Set<() => void>();
 
 export function subscribeOfflineQueue(listener: () => void) {
   queueListeners.add(listener);
-  return () => queueListeners.delete(listener);
+  return () => {
+    queueListeners.delete(listener);
+  };
 }
 
 function notifyQueueChange() {

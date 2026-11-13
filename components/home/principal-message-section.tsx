@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, CardContent } from '@/components/ui/card';
-import { Quote } from 'lucide-react';
+import { ArrowUpRight, Quote } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { SITE_CONTENT_KEYS } from '@/lib/site-content-keys';
 import { getDefaultPublicSiteContent } from '@/lib/site-content-defaults';
@@ -32,27 +32,40 @@ export function PrincipalMessageSection() {
   }, []);
 
   return (
-    <section className="bg-muted/30 py-16 md:py-24">
+    <section className="bg-[#f2f4ed] py-20 md:py-28">
       <div className="container">
-        <div className="grid items-center gap-12 md:grid-cols-2">
+        <div className="grid items-center gap-10 md:grid-cols-[0.92fr_1.08fr] md:gap-16">
           <div>
-            <img src={data.image || '/placeholder.svg'} alt="Principal" className="w-full rounded-lg shadow-lg" />
+            <div className="relative mx-auto w-full max-w-lg">
+              <div aria-hidden="true" className="absolute -bottom-4 -left-4 h-full w-full rounded-[2rem] border border-primary/20" />
+              <img src={data.image || '/placeholder.svg'} alt="Principal of Habsan Achievers Academy" className="relative aspect-[4/5] w-full rounded-[2rem] object-cover shadow-xl shadow-emerald-950/10" />
+              <div className="absolute -bottom-2 right-4 rounded-2xl border border-white/60 bg-background/95 px-5 py-4 shadow-lg backdrop-blur sm:-right-8 sm:bottom-7">
+                <p className="font-heading text-lg font-semibold text-primary">Growing with purpose</p>
+                <p className="mt-1 text-xs text-muted-foreground">A school community that cares</p>
+              </div>
+            </div>
           </div>
           <div>
-            <div className="mb-4 flex items-center gap-2">
-              <Quote className="h-8 w-8 text-primary" />
-              <h2 className="font-heading text-3xl font-bold md:text-4xl">{data.heading}</h2>
+            <div className="mb-6">
+              <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary">A word from our leadership</p>
+              <div className="flex items-start gap-3">
+                <Quote className="mt-1 h-7 w-7 shrink-0 text-primary/45" />
+                <h2 className="font-heading text-3xl font-semibold leading-tight tracking-tight md:text-4xl">{data.heading}</h2>
+              </div>
             </div>
-            <Card className="border-l-4 border-l-primary">
-              <CardContent className="pt-6">
+            <Card className="rounded-2xl border-border/60 bg-background/80 shadow-sm">
+              <CardContent className="p-6 md:p-8">
                 {data.paragraphs.map((p, i) => (
                   <p key={i} className="mb-4 leading-relaxed text-muted-foreground last:mb-6">
                     {p}
                   </p>
                 ))}
-                <div>
-                  <p className="font-heading text-lg font-semibold">{data.signatureName}</p>
-                  <p className="text-sm text-muted-foreground">{data.signatureTitle}</p>
+                <div className="flex items-center justify-between gap-4 border-t border-border/70 pt-5">
+                  <div>
+                    <p className="font-heading text-lg font-semibold">{data.signatureName}</p>
+                    <p className="text-sm text-muted-foreground">{data.signatureTitle}</p>
+                  </div>
+                  <ArrowUpRight className="h-5 w-5 shrink-0 text-primary/60" />
                 </div>
               </CardContent>
             </Card>

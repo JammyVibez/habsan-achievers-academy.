@@ -1,4 +1,4 @@
-import { GraduationCap, Users, BookOpen, Award, Shield, Sparkles } from "lucide-react"
+import { GraduationCap, Users, BookOpen, Award, Shield, Sparkles, ArrowUpRight } from "lucide-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 const features = [
@@ -36,27 +36,29 @@ const features = [
 
 export function FeaturesSection() {
   return (
-    <section className="py-16 md:py-24">
+    <section className="relative py-20 md:py-28">
       <div className="container">
-        <div className="text-center mb-12">
-          <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4 text-balance">
+        <div className="mx-auto mb-14 max-w-3xl text-center">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary">The Habsan difference</p>
+          <h2 className="mb-5 font-heading text-3xl font-semibold tracking-tight text-balance md:text-5xl">
             Why Choose HABSAN ACHIEVERS ACADEMY?
           </h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto text-pretty">
+          <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground text-pretty md:text-lg">
             We provide a nurturing environment where students excel academically and develop into well-rounded
             individuals
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {features.map((feature, index) => (
-            <Card key={index} className="border-border hover:border-primary/50 transition-colors">
-              <CardContent className="pt-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 text-primary mb-4">
+            <Card key={index} className="group rounded-2xl border-border/70 bg-card/80 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/25 hover:shadow-xl hover:shadow-primary/5">
+              <CardContent className="relative p-6 md:p-7">
+                <div className="mb-6 flex h-12 w-12 items-center justify-center rounded-2xl bg-primary/7 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                   <feature.icon className="h-6 w-6" />
                 </div>
-                <h3 className="font-heading font-semibold text-xl mb-2">{feature.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{feature.description}</p>
+                <h3 className="mb-2 font-heading text-lg font-semibold tracking-tight md:text-xl">{feature.title}</h3>
+                <p className="leading-relaxed text-muted-foreground">{feature.description}</p>
+                <ArrowUpRight className="absolute right-6 top-7 h-4 w-4 text-primary/0 transition-all group-hover:right-5 group-hover:text-primary/70" />
               </CardContent>
             </Card>
           ))}

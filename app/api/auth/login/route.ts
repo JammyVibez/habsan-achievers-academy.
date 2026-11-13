@@ -2,13 +2,13 @@ import { NextRequest, NextResponse } from 'next/server';
 import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword } from '@/lib/password';
-import { createSessionToken, setSessionCookie } from '@/lib/auth-session';
+import { createSessionToken, setSessionCookie, type SessionRole } from '@/lib/auth-session';
 
 function isAdmissionNumber(value: string): boolean {
   return /^HAA\/\d{4}\/\d{3}$/.test(value);
 }
 
-function getRedirectPath(role: 'admin' | 'teacher' | 'student', passwordMustChange: boolean): string {
+function getRedirectPath(role: Exclude<SessionRole, 'guest'>, passwordMustChange: boolean): string {
   if (role === 'student' && passwordMustChange) return '/student/onboarding';
   return `/${role}`;
 }
@@ -78,23 +78,24 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
 
-    if (!['admin', 'teacher', 'student'].includes(user.role)) {
+    if (user.role === 'guest') {
       return NextResponse.json({ error: 'User role is not allowed to access dashboard' }, { status: 403 });
     }
 
-    const token = createSessionToken(user.id, user.role, user.passwordMustChange);
+    const role = user.role as Exclude<SessionRole, 'guest'>;
+    const token = createSessionToken(user.id, role, user.passwordMustChange);
     const response = NextResponse.json(
       {
         success: true,
         user: {
           id: user.id,
-          role: user.role,
+          role,
           firstName: user.firstName,
           lastName: user.lastName,
           email: user.email,
           requiresPasswordChange: user.passwordMustChange,
         },
-        redirectTo: getRedirectPath(user.role, user.passwordMustChange),
+        redirectTo: getRedirectPath(role, user.passwordMustChange),
       },
       { status: 200 },
     );

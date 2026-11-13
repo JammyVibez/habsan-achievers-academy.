@@ -27,27 +27,28 @@ const testimonials = [
 
 export function TestimonialsSection() {
   return (
-    <section className="py-16 md:py-24 bg-accent">
+    <section className="bg-background py-20 md:py-28">
       <div className="container">
-        <div className="text-center mb-12">
-          <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4 text-balance">What Parents Say About Us</h2>
-          <p className="text-muted-foreground text-lg max-w-2xl mx-auto text-pretty">
+        <div className="mx-auto mb-14 max-w-3xl text-center">
+          <p className="mb-4 text-xs font-semibold uppercase tracking-[0.2em] text-primary">The Habsan community</p>
+          <h2 className="mb-5 font-heading text-3xl font-semibold tracking-tight text-balance md:text-5xl">What Parents Say About Us</h2>
+          <p className="mx-auto max-w-2xl text-base leading-relaxed text-muted-foreground text-pretty md:text-lg">
             Hear from parents who have entrusted their children's education to us
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
           {testimonials.map((testimonial, index) => (
-            <Card key={index} className="border-border">
-              <CardContent className="pt-6">
-                <div className="flex gap-1 mb-4">
+            <Card key={index} className="rounded-2xl border-border/70 bg-[#f8f8f3] shadow-sm">
+              <CardContent className="p-6 md:p-7">
+                <div className="mb-5 flex gap-1">
                   {Array.from({ length: testimonial.rating }).map((_, i) => (
-                    <Star key={i} className="h-5 w-5 fill-secondary text-secondary" />
+                    <Star key={i} className="h-4 w-4 fill-amber-400 text-amber-400" />
                   ))}
                 </div>
-                <p className="text-muted-foreground leading-relaxed mb-4 italic">"{testimonial.content}"</p>
+                <p className="mb-6 min-h-28 leading-relaxed text-foreground/80">"{testimonial.content}"</p>
                 <div>
-                  <p className="font-semibold">{testimonial.name}</p>
+                  <p className="font-heading font-semibold">{testimonial.name}</p>
                   <p className="text-sm text-muted-foreground">{testimonial.role}</p>
                 </div>
               </CardContent>

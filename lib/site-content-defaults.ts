@@ -76,7 +76,7 @@ export function getDefaultPublicSiteContent(): PublicSiteContent {
         },
         {
           title: 'Join Our Community',
-          subtitle: 'Admissions Now Open for 2024/2025 Session',
+          subtitle: 'Join a community where every learner can thrive.',
           image: '/happy-school-children-in-blue-uniform.jpg',
         },
       ],
@@ -125,10 +125,10 @@ export function getDefaultPublicSiteContent(): PublicSiteContent {
       ],
       feesNote: '* Fees are per academic session and subject to review',
       importantDates: [
-        'Application Opens: January 2, 2025',
-        'Application Closes: August 31, 2025',
-        'Entrance Exam: September 5-7, 2025',
-        'Resumption Date: September 15, 2025',
+        'Application availability: Contact the admissions office for current information',
+        'Entrance assessment: Details are shared after your application is reviewed',
+        'School visits: Arrange a visit with the admissions office',
+        'Resumption dates: Confirm the current calendar with the school office',
       ],
       admissionsOffice: [
         'Phone: +234-XXX-XXX-XXXX',

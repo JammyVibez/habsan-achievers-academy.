@@ -6,12 +6,15 @@ export function CTASection() {
   return (
     <section className="py-16 md:py-24">
       <div className="container">
-        <div className="rounded-2xl bg-gradient-to-r from-primary to-primary/80 p-8 md:p-12 text-center text-primary-foreground">
+        <div className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-emerald-950 via-primary to-emerald-900 p-8 text-center text-primary-foreground shadow-2xl shadow-primary/15 md:p-14">
+          <div aria-hidden="true" className="pointer-events-none absolute -right-16 -top-24 h-72 w-72 rounded-full border border-white/10" />
+          <div aria-hidden="true" className="pointer-events-none absolute -right-6 -top-14 h-52 w-52 rounded-full border border-white/10" />
+          <div className="relative mx-auto max-w-3xl">
           <h2 className="font-heading font-bold text-3xl md:text-4xl mb-4 text-balance">
             Ready to Join HABSAN ACHIEVERS ACADEMY?
           </h2>
           <p className="text-lg text-primary-foreground/90 mb-4 max-w-2xl mx-auto text-pretty">
-            Admissions are now open for the 2024/2025 academic session. Give your child the gift of quality education.
+            Give your child the confidence, curiosity and care to build a future full of possibility.
           </p>
           <p className="text-sm text-primary-foreground/80 mb-8 max-w-xl mx-auto text-pretty">
             Applying and checking results both require a valid PIN from the school or the PIN shop — no PIN, no access.
@@ -47,6 +50,7 @@ export function CTASection() {
             >
               <Link href="/contact">Contact Us</Link>
             </Button>
+          </div>
           </div>
         </div>
       </div>

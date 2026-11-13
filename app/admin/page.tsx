@@ -92,11 +92,7 @@ export default async function AdminDashboardPage() {
               <div className="mb-1 font-heading text-2xl font-bold">{stat.value}</div>
               <p
                 className={`text-xs ${
-                  stat.trend === 'up'
-                    ? 'text-green-600'
-                    : stat.trend === 'down'
-                      ? 'text-destructive'
-                      : 'text-muted-foreground'
+                  stat.trend === 'up' ? 'text-green-600' : 'text-muted-foreground'
                 }`}
               >
                 {stat.change}

@@ -15,10 +15,10 @@ export default function AdmissionsPage() {
         <section className="py-12 bg-primary text-primary-foreground">
           <div className="container">
             <div className="max-w-3xl">
-              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4">Admissions 2024/2025</h1>
+              <h1 className="font-heading font-bold text-4xl md:text-5xl mb-4">Admissions</h1>
               <p className="text-lg text-primary-foreground/90 mb-6">
-                Join HABSAN ACHIEVERS ACADEMY and give your child the gift of quality education. Applications are now
-                open for the 2024/2025 academic session.
+                Join HABSAN ACHIEVERS ACADEMY and give your child the gift of quality education. Contact our admissions
+                office for current application availability and important dates.
               </p>
               <Button asChild size="lg" variant="secondary">
                 <Link href="/admissions/apply">
