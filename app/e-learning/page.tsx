@@ -16,6 +16,8 @@ import {
   TrendingUp,
 } from "lucide-react"
 import Link from "next/link"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
 
 // Mock data
 const courses = [
@@ -104,7 +106,9 @@ const assignments = [
 
 export default function ELearningPage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
+      <SiteHeader />
+      <main className="flex-1">
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-primary to-primary/80 text-white py-12">
         <div className="container">
@@ -378,6 +382,8 @@ export default function ELearningPage() {
           </div>
         </div>
       </div>
+      </main>
+      <SiteFooter />
     </div>
   )
 }

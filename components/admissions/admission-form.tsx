@@ -12,8 +12,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { Loader2, CheckCircle2, ArrowRight, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
-import { FileUp, Upload, X, AlertCircle, Info } from "lucide-react"
+import { FileUp, Upload, Info } from "lucide-react"
 import Link from "next/link"
+
+const MAX_FILE_BYTES = 5 * 1024 * 1024
 
 export function AdmissionForm() {
   const router = useRouter()
@@ -104,6 +106,40 @@ export function AdmissionForm() {
     }
   }
 
+  const handleDocumentsNext = (e: React.FormEvent) => {
+    e.preventDefault()
+    setError("")
+
+    const missing: string[] = []
+    if (!formData.documents.birthCertificate) missing.push("birth certificate")
+    if (!formData.documents.parentID) missing.push("parent/guardian ID")
+    if (!formData.documents.proofOfResidence) missing.push("proof of residence")
+    if (!formData.documents.medicalCertificate) missing.push("medical fitness certificate")
+    if (formData.documents.passportPhotos.length === 0) missing.push("passport photograph")
+
+    if (missing.length > 0) {
+      setError(`Please upload: ${missing.join(", ")}.`)
+      return
+    }
+
+    const files = [
+      formData.documents.birthCertificate,
+      formData.documents.schoolReportCard,
+      formData.documents.parentID,
+      formData.documents.proofOfResidence,
+      formData.documents.medicalCertificate,
+      ...formData.documents.passportPhotos,
+    ].filter((file): file is File => Boolean(file))
+
+    const oversized = files.find((file) => file.size > MAX_FILE_BYTES)
+    if (oversized) {
+      setError(`${oversized.name} is larger than 5MB. Please upload a smaller file.`)
+      return
+    }
+
+    setStep(5)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError("")
@@ -163,12 +199,16 @@ export function AdmissionForm() {
         throw new Error(data.error || 'Failed to submit application');
       }
 
-      console.log("[v0] Admission application submitted successfully:", data)
-
       const ref = encodeURIComponent(data.applicationRef as string)
       router.push(`/admissions/success?ref=${ref}`)
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to submit application. Please try again.")
+      const message = err instanceof Error ? err.message : "Failed to submit application. Please try again."
+      setError(message)
+      // A PIN can expire or be used up between validation and submission.
+      if (/\bpin\b/i.test(message)) {
+        setPinValidated(false)
+        setStep(1)
+      }
     } finally {
       setLoading(false)
     }
@@ -222,16 +262,9 @@ export function AdmissionForm() {
             <Alert className="bg-blue-50 border-blue-200">
               <Info className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-900">
-                You need an Admission PIN to apply. Purchase one from our PIN shop if you haven&apos;t already.
+                You need an Admission PIN to apply. PINs are issued by the school office — collect one before starting.
               </AlertDescription>
             </Alert>
-
-            {error && (
-              <Alert className="bg-red-50 border-red-200">
-                <AlertCircle className="h-4 w-4 text-red-600" />
-                <AlertDescription className="text-red-900">{error}</AlertDescription>
-              </Alert>
-            )}
 
             <div className="space-y-4">
               <div className="space-y-2">
@@ -252,11 +285,12 @@ export function AdmissionForm() {
 
               <div className="pt-4 border-t">
                 <p className="text-sm font-semibold mb-3">Don&apos;t have a PIN?</p>
-                <Link href="/pin-shop">
-                  <Button type="button" variant="outline" className="w-full">
-                    Get Admission PIN from School Admin
-                  </Button>
-                </Link>
+                <p className="mb-3 text-xs text-muted-foreground">
+                  The online PIN shop is closed. Admission PINs are issued by the school administration office.
+                </p>
+                <Button asChild type="button" variant="outline" className="w-full">
+                  <Link href="/contact">Contact the school office</Link>
+                </Button>
               </div>
             </div>
 
@@ -487,13 +521,7 @@ export function AdmissionForm() {
 
         {/* Step 4: Required Documents */}
         {step === 4 && (
-          <form
-            onSubmit={(e) => {
-              e.preventDefault()
-              setStep(5)
-            }}
-            className="space-y-6"
-          >
+          <form onSubmit={handleDocumentsNext} className="space-y-6">
             <Alert className="bg-blue-50 border-blue-200">
               <FileUp className="h-4 w-4 text-blue-600" />
               <AlertDescription className="text-blue-900">
@@ -573,7 +601,7 @@ export function AdmissionForm() {
 
             {/* Passport Photos */}
             <div className="space-y-2">
-              <Label>Two Recent Passport Photographs *</Label>
+              <Label>Recent Passport Photograph(s) *</Label>
               <div className="border-2 border-dashed border-gray-300 rounded-lg p-4 text-center hover:border-primary/50 transition-colors cursor-pointer">
                 <input
                   type="file"

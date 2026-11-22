@@ -25,8 +25,8 @@ export function SchoolLogo({
       <Image
         src={SCHOOL_BRAND.logoPath}
         alt={`${SCHOOL_BRAND.shortName} logo`}
-        width={size}
-        height={Math.round(size * 1.18)}
+        width={Math.round(size * 0.94)}
+        height={size}
         className="h-auto w-auto object-contain"
         style={{ height: size, width: 'auto' }}
         priority={priority}

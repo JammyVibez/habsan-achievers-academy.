@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 import { hashPassword } from '@/lib/password';
 import {
@@ -16,36 +17,71 @@ export type CreatedStudentAccount = {
   studentId: string;
 };
 
-export async function createStudentAccount(data: StudentCreationData): Promise<CreatedStudentAccount> {
+/** Thrown for invalid or incomplete student details (safe to show to the user). */
+export class StudentInputError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'StudentInputError';
+  }
+}
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function clean(value: string | null | undefined): string {
+  return (value ?? '').trim();
+}
+
+export async function createStudentAccount(
+  data: StudentCreationData,
+  client?: Prisma.TransactionClient,
+): Promise<CreatedStudentAccount> {
+  const firstName = clean(data.firstName);
+  const lastName = clean(data.lastName);
+  const classAssigned = clean(data.classAssigned);
+  const parentPhone = clean(data.parentPhone);
+  const parentEmail = clean(data.parentEmail);
+
+  if (!firstName) throw new StudentInputError('First name is required');
+  if (!lastName) throw new StudentInputError('Last name is required');
+  if (!classAssigned) throw new StudentInputError('Class assignment is required');
+  if (!parentPhone) throw new StudentInputError('Parent/guardian phone number is required');
+  if (!parentEmail) throw new StudentInputError('Parent/guardian email is required');
+  if (!EMAIL_PATTERN.test(parentEmail)) {
+    throw new StudentInputError('Parent/guardian email address is not valid');
+  }
+
+  const dob = new Date(clean(data.dateOfBirth));
+  if (Number.isNaN(dob.getTime())) {
+    throw new StudentInputError('Date of birth is required and must be a valid date');
+  }
+  if (dob.getTime() > Date.now()) {
+    throw new StudentInputError('Date of birth cannot be in the future');
+  }
+
   const year = new Date().getFullYear();
-  const seq = await nextAdmissionSequence(year);
+  const seq = await nextAdmissionSequence(year, client ?? prisma);
   const admissionNumber = generateAdmissionNumber(year, seq);
   const defaultPassword = generateDefaultPassword();
   const gender = data.gender === 'Female' ? 'Female' : 'Male';
-
-  let email = generateStudentEmail(data.firstName, data.lastName, admissionNumber);
-  for (let i = 0; i < 5; i++) {
-    const taken = await prisma.user.findUnique({ where: { email } });
-    if (!taken) break;
-    email = `${data.firstName.toLowerCase()}.${data.lastName.toLowerCase()}.${Math.random().toString(36).slice(2, 6)}@habsan.edu.ng`;
-  }
-
   const passwordHash = await hashPassword(defaultPassword);
-  const parentName = (data.parentGuardianName ?? 'Parent / Guardian').trim() || 'Parent / Guardian';
-  const dob = new Date(data.dateOfBirth);
-  if (Number.isNaN(dob.getTime())) {
-    throw new Error('Invalid date of birth');
-  }
+  const parentName = clean(data.parentGuardianName) || 'Parent / Guardian';
 
-  const result = await prisma.$transaction(async (tx) => {
+  const createRecords = async (tx: Prisma.TransactionClient) => {
+    let email = generateStudentEmail(firstName, lastName, admissionNumber);
+    for (let i = 0; i < 5; i++) {
+      const taken = await tx.user.findUnique({ where: { email } });
+      if (!taken) break;
+      email = `${firstName.toLowerCase()}.${lastName.toLowerCase()}.${Math.random().toString(36).slice(2, 6)}@habsan.edu.ng`;
+    }
+
     const user = await tx.user.create({
       data: {
         email,
         passwordHash,
         role: 'student',
-        firstName: data.firstName.trim(),
-        lastName: data.lastName.trim(),
-        phone: data.parentPhone?.trim() || null,
+        firstName,
+        lastName,
+        phone: parentPhone,
         passwordMustChange: true,
       },
     });
@@ -54,25 +90,27 @@ export async function createStudentAccount(data: StudentCreationData): Promise<C
       data: {
         userId: user.id,
         admissionNumber,
-        classLevel: data.classAssigned.trim(),
+        classLevel: classAssigned,
         dateOfBirth: dob,
         gender,
-        address: data.address?.trim() || null,
+        address: clean(data.address) || null,
         parentGuardianName: parentName,
-        parentGuardianPhone: data.parentPhone.trim(),
-        parentGuardianEmail: data.parentEmail?.trim() || null,
-        medicalConditions: data.medicalInfo?.trim() || null,
+        parentGuardianPhone: parentPhone,
+        parentGuardianEmail: parentEmail,
+        medicalConditions: clean(data.medicalInfo) || null,
         admissionDate: new Date(),
         status: 'active',
       },
     });
 
-    return { user, student };
-  });
+    return { user, student, email };
+  };
+
+  const result = client ? await createRecords(client) : await prisma.$transaction(createRecords);
 
   return {
     admissionNumber,
-    email,
+    email: result.email,
     defaultPassword,
     userId: result.user.id,
     studentId: result.student.id,

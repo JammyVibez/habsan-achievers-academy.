@@ -54,18 +54,20 @@ export function AddStudentModal({ open, onOpenChange, classes, onStudentAdded }:
       const response = await fetch('/api/students/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
+      const data = await response.json().catch(() => ({}));
 
       if (!response.ok) {
-        throw new Error(data.error || 'Failed to create student');
+        throw new Error(data.error || `Failed to create student (HTTP ${response.status})`);
       }
 
       setSuccess(true);
       setCreatedStudent(data.student);
-      
+      onStudentAdded?.();
+
       // Reset form
       setFormData({
         firstName: '',
@@ -78,11 +80,6 @@ export function AddStudentModal({ open, onOpenChange, classes, onStudentAdded }:
         medicalInfo: '',
       });
 
-      // Call callback after 2 seconds
-      setTimeout(() => {
-        onStudentAdded?.();
-        onOpenChange(false);
-      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     } finally {
@@ -166,6 +163,12 @@ export function AddStudentModal({ open, onOpenChange, classes, onStudentAdded }:
                 <p>Student must change password on first login</p>
               </div>
             </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <Button type="button" onClick={() => onOpenChange(false)}>
+                Done
+              </Button>
+            </div>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4 py-4">
@@ -213,8 +216,8 @@ export function AddStudentModal({ open, onOpenChange, classes, onStudentAdded }:
             <div>
               <Label htmlFor="classAssigned">Class Assignment *</Label>
               <Select value={formData.classAssigned} onValueChange={(value) => setFormData({ ...formData, classAssigned: value })}>
-                <SelectTrigger id="classAssigned" disabled={isLoading}>
-                  <SelectValue placeholder="Select class" />
+                <SelectTrigger id="classAssigned" disabled={isLoading || liveClasses.length === 0}>
+                  <SelectValue placeholder={liveClasses.length === 0 ? 'Loading classes…' : 'Select class'} />
                 </SelectTrigger>
                 <SelectContent>
                   {liveClasses.map((cls) => (

@@ -1,6 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { isPrismaUniqueViolation } from '@/lib/prisma-errors';
+import {
+  databaseSchemaMessage,
+  databaseUnavailableMessage,
+  isPrismaConnectionError,
+  isPrismaMissingTable,
+  isPrismaUniqueViolation,
+} from '@/lib/prisma-errors';
+
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function fileMeta(file: File | null): { name: string; size: number; type: string } | null {
   if (!file || typeof file.name !== 'string') return null;
@@ -38,17 +46,40 @@ export async function POST(request: NextRequest) {
       medicalCertificate: formData.get('documents.medicalCertificate') as File | null,
     };
 
-    if (!firstName || !lastName || !dateOfBirth || !classLevel || !parentEmail) {
+    if (!firstName?.trim() || !lastName?.trim() || !dateOfBirth || !classLevel?.trim() || !parentEmail?.trim()) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    if (!documents.birthCertificate || !documents.parentID || !documents.proofOfResidence || !documents.medicalCertificate) {
-      return NextResponse.json({ error: 'All required documents must be uploaded' }, { status: 400 });
+    if (!EMAIL_PATTERN.test(parentEmail.trim())) {
+      return NextResponse.json({ error: 'Parent/guardian email address is not valid' }, { status: 400 });
+    }
+
+    if (!parentPhone?.trim()) {
+      return NextResponse.json({ error: 'Parent/guardian phone number is required' }, { status: 400 });
+    }
+
+    if (
+      !fileMeta(documents.birthCertificate) ||
+      !fileMeta(documents.parentID) ||
+      !fileMeta(documents.proofOfResidence) ||
+      !fileMeta(documents.medicalCertificate)
+    ) {
+      return NextResponse.json(
+        { error: 'Birth certificate, parent ID, proof of residence and medical certificate are required' },
+        { status: 400 },
+      );
+    }
+
+    if (documents.passportPhotos.filter((f) => fileMeta(f)).length === 0) {
+      return NextResponse.json({ error: 'At least one passport photograph is required' }, { status: 400 });
     }
 
     const dob = new Date(dateOfBirth);
     if (Number.isNaN(dob.getTime())) {
       return NextResponse.json({ error: 'Invalid date of birth' }, { status: 400 });
+    }
+    if (dob.getTime() > Date.now()) {
+      return NextResponse.json({ error: 'Date of birth cannot be in the future' }, { status: 400 });
     }
 
     const pinNormalized = pin?.trim().toUpperCase();
@@ -67,7 +98,10 @@ export async function POST(request: NextRequest) {
 
     if (!issuedPin) {
       return NextResponse.json(
-        { error: 'Invalid or expired admission PIN. Purchase a valid PIN from the PIN Shop.' },
+        {
+          error:
+            'This admission PIN is invalid, expired or already used. Contact the school office for a new PIN.',
+        },
         { status: 400 },
       );
     }
@@ -84,6 +118,16 @@ export async function POST(request: NextRequest) {
     };
 
     await prisma.$transaction(async (tx) => {
+      // Only consume the PIN if it is still active, so two simultaneous
+      // submissions cannot both use the same PIN.
+      const consumed = await tx.issuedPin.updateMany({
+        where: { id: issuedPin.id, status: 'active' },
+        data: { status: 'used', usedAt: new Date() },
+      });
+      if (consumed.count !== 1) {
+        throw new Error('PIN_ALREADY_USED');
+      }
+
       await tx.admissionApplication.create({
         data: {
           applicationRef,
@@ -95,7 +139,7 @@ export async function POST(request: NextRequest) {
           previousSchool: previousSchool?.trim() || null,
           address: address?.trim() || null,
           parentName: parentName?.trim() || null,
-          parentPhone: parentPhone?.trim() || null,
+          parentPhone: parentPhone.trim(),
           parentEmail: parentEmail.trim().toLowerCase(),
           parentAddress: parentAddress?.trim() || null,
           emergencyContact: emergencyContact?.trim() || null,
@@ -107,11 +151,6 @@ export async function POST(request: NextRequest) {
           status: 'pending',
           documentMeta,
         },
-      });
-
-      await tx.issuedPin.update({
-        where: { id: issuedPin.id },
-        data: { status: 'used', usedAt: new Date() },
       });
     });
 
@@ -130,8 +169,20 @@ export async function POST(request: NextRequest) {
       { status: 201 },
     );
   } catch (error) {
+    if (error instanceof Error && error.message === 'PIN_ALREADY_USED') {
+      return NextResponse.json(
+        { error: 'This admission PIN was just used for another application. Contact the school office for a new PIN.' },
+        { status: 409 },
+      );
+    }
     if (isPrismaUniqueViolation(error)) {
       return NextResponse.json({ error: 'Duplicate application reference; please try again.' }, { status: 409 });
+    }
+    if (isPrismaMissingTable(error)) {
+      return NextResponse.json({ error: databaseSchemaMessage() }, { status: 503 });
+    }
+    if (isPrismaConnectionError(error)) {
+      return NextResponse.json({ error: databaseUnavailableMessage() }, { status: 503 });
     }
     console.error('Admission submission error:', error);
     return NextResponse.json({ error: 'Failed to submit admission application' }, { status: 500 });

@@ -1,11 +1,11 @@
 /* HABSAN offline service worker — caches visited pages & static assets */
-const CACHE_VERSION = 'haa-offline-v1';
+const CACHE_VERSION = 'haa-offline-v2';
 const STATIC_CACHE = `${CACHE_VERSION}-static`;
 const PAGES_CACHE = `${CACHE_VERSION}-pages`;
 const API_CACHE = `${CACHE_VERSION}-api`;
 const OFFLINE_URL = '/offline';
 
-const PRECACHE = [OFFLINE_URL, '/icon.svg'];
+const PRECACHE = [OFFLINE_URL, '/school-icon-192.png'];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

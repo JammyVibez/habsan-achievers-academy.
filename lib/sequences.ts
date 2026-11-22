@@ -1,8 +1,11 @@
+import { Prisma } from '@prisma/client';
 import { prisma } from '@/lib/prisma';
 
-export async function nextAdmissionSequence(year: number): Promise<number> {
+type DbClient = Prisma.TransactionClient | typeof prisma;
+
+export async function nextAdmissionSequence(year: number, db: DbClient = prisma): Promise<number> {
   const prefix = `HAA/${year}/`;
-  const rows = await prisma.student.findMany({
+  const rows = await db.student.findMany({
     where: { admissionNumber: { startsWith: prefix } },
     select: { admissionNumber: true },
   });
@@ -15,9 +18,9 @@ export async function nextAdmissionSequence(year: number): Promise<number> {
   return max + 1;
 }
 
-export async function nextStaffSequence(year: number): Promise<number> {
+export async function nextStaffSequence(year: number, db: DbClient = prisma): Promise<number> {
   const prefix = `TCH/${year}/`;
-  const rows = await prisma.teacher.findMany({
+  const rows = await db.teacher.findMany({
     where: { staffId: { startsWith: prefix } },
     select: { staffId: true },
   });

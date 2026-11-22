@@ -1,5 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
 import { BookOpen, Award, Sparkles, Target, Heart, Lightbulb, Trophy } from "lucide-react"
 
 const phases = [
@@ -104,7 +106,9 @@ const milestones = [
 
 export default function OurStoryPage() {
   return (
-    <div className="min-h-screen">
+    <div className="flex min-h-screen flex-col">
+      <SiteHeader />
+      <main className="flex-1">
       {/* Hero Section */}
       <section className="relative py-20 bg-gradient-to-br from-primary to-primary/80 text-white">
         <div className="container">
@@ -289,6 +293,8 @@ export default function OurStoryPage() {
           </div>
         </div>
       </section>
+      </main>
+      <SiteFooter />
     </div>
   )
 }

@@ -5,6 +5,8 @@ import { Input } from "@/components/ui/input"
 import { Search, ShoppingCart } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import Image from "next/image"
+import { SiteHeader } from "@/components/site-header"
+import { SiteFooter } from "@/components/site-footer"
 
 // Mock data
 const products = [
@@ -72,7 +74,9 @@ const products = [
 
 export default function MarketplacePage() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="flex min-h-screen flex-col bg-background">
+      <SiteHeader />
+      <main className="flex-1">
       <div className="container mx-auto px-4 py-8">
         <div className="space-y-6">
           <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -157,6 +161,8 @@ export default function MarketplacePage() {
           </Card>
         </div>
       </div>
+      </main>
+      <SiteFooter />
     </div>
   )
 }

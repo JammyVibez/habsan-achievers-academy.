@@ -24,8 +24,17 @@ export const metadata: Metadata = {
   description:
     "HABSAN ACHIEVERS ACADEMY (H.A.A) - A leading Nigerian educational institution offering quality education from Pre-Nursery to Secondary School (SS3)",
   keywords: "Nigerian school, private school, quality education, Abuja school, primary school, secondary school",
-  generator: 'v0.app',
   manifest: '/manifest.json',
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon-32x32.png', type: 'image/png', sizes: '32x32' },
+      { url: '/school-icon-192.png', type: 'image/png', sizes: '192x192' },
+      { url: '/school-icon-512.png', type: 'image/png', sizes: '512x512' },
+    ],
+    shortcut: '/favicon-32x32.png',
+    apple: [{ url: '/apple-icon.png', sizes: '180x180', type: 'image/png' }],
+  },
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
@@ -34,7 +43,7 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#1e40af',
+  themeColor: '#0B4D2C',
 }
 
 export default function RootLayout({

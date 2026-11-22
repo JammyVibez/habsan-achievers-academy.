@@ -2,7 +2,7 @@ import { prisma } from '@/lib/prisma';
 
 const CLASS_CATALOG_KEY = 'class_catalog';
 
-const DEFAULT_CLASSES = [
+export const DEFAULT_CLASSES = [
   'Pre-Nursery',
   'Nursery 1',
   'Nursery 2',
@@ -36,15 +36,24 @@ function normalizeClasses(classes: string[]): string[] {
   return [...new Set(classes.map((c) => c.trim()).filter(Boolean))];
 }
 
+/**
+ * Classes shown in admission / student forms.
+ * A database problem must never leave the class picker empty, otherwise no
+ * application or student record can be submitted.
+ */
 export async function getClassCatalog(): Promise<string[]> {
-  const block = await prisma.siteContentBlock.findUnique({
-    where: { key: CLASS_CATALOG_KEY },
-    select: { payload: true },
-  });
-  const payload = block?.payload as { classes?: unknown } | null;
-  if (payload && Array.isArray(payload.classes)) {
-    const classes = normalizeClasses(payload.classes.filter((v): v is string => typeof v === 'string'));
-    if (classes.length > 0) return classes;
+  try {
+    const block = await prisma.siteContentBlock.findUnique({
+      where: { key: CLASS_CATALOG_KEY },
+      select: { payload: true },
+    });
+    const payload = block?.payload as { classes?: unknown } | null;
+    if (payload && Array.isArray(payload.classes)) {
+      const classes = normalizeClasses(payload.classes.filter((v): v is string => typeof v === 'string'));
+      if (classes.length > 0) return classes;
+    }
+  } catch (error) {
+    console.warn('[class-catalog] falling back to default classes:', error);
   }
   return DEFAULT_CLASSES;
 }
@@ -63,4 +72,3 @@ export async function setClassCatalog(classes: string[]): Promise<string[]> {
   });
   return normalized;
 }
-
